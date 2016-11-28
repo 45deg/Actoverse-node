@@ -9,15 +9,15 @@ class Coordinator extends Actor {
   }
   receive(command, arg) {
     if (command === 'start_2pc') {
-      this.broadcast('query', this.name);
+      this.broadcast('query');
     } else if (command === 'agreement') {
       this.responses.push(arg);
       if (this.responses.length === this.cohorts.length) {
         // finished
         if (this.responses.every(e => e)) {
-          this.broadcast('commit', this.name);
+          this.broadcast('commit');
         } else {
-          this.broadcast('rollback', this.name);
+          this.broadcast('rollback');
         }
         this.responses = [];
         this.become('waitAcknowledgements');
@@ -43,17 +43,17 @@ class Cohort extends Actor {
     super();
     this.decision = decision;
   }
-  receive(command, name) {
+  receive(command) {
     if (command === 'query') {
-      this.send(name, 'agreement', this.decision);
+      this.send(this.sender, 'agreement', this.decision);
     } else if (command === 'commit') {
       // commit code here
       setTimeout(() => {
-        this.send(name, 'commit_ack');
+        this.send(this.sender, 'commit_ack');
       }, 1000);
     } else if (command === 'rollback') {
       // rollback code here
-      this.send(name, 'rollback_ack');
+      this.send(this.sender, 'rollback_ack');
     }
   }
 }

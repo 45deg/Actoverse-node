@@ -9,15 +9,15 @@ class Coordinator extends Actor {
   }
   receive(command, arg) {
     if (command === 'start_2pc') {
-      this.broadcast('query', this.pid);
+      this.broadcast('query', this.name);
     } else if (command === 'agreement') {
       this.responses.push(arg);
       if (this.responses.length === this.cohorts.length) {
         // finished
         if (this.responses.every(e => e)) {
-          this.broadcast('commit', this.pid);
+          this.broadcast('commit', this.name);
         } else {
-          this.broadcast('rollback', this.pid);
+          this.broadcast('rollback', this.name);
         }
         this.responses = [];
         this.become('waitAcknowledgements');
@@ -43,23 +43,23 @@ class Cohort extends Actor {
     super();
     this.decision = decision;
   }
-  receive(command, pid) {
+  receive(command, name) {
     if (command === 'query') {
-      this.send(pid, 'agreement', this.decision);
+      this.send(name, 'agreement', this.decision);
     } else if (command === 'commit') {
       // commit code here
       setTimeout(() => {
-        this.send(pid, 'commit_ack');
+        this.send(name, 'commit_ack');
       }, 1000);
     } else if (command === 'rollback') {
       // rollback code here
-      this.send(pid, 'rollback_ack');
+      this.send(name, 'rollback_ack');
     }
   }
 }
 
 actor({ Coordinator, Cohort }).start(function(sys){
-  let cohorts = [sys.spawn('Cohort', true), sys.spawn('Cohort', true), sys.spawn('Cohort', true)];
-  let coordinator = sys.spawn('Coordinator', cohorts);
+  let cohorts = [sys.spawn('Cohort', 'cohort-1', true), sys.spawn('Cohort', 'cohort-2', true), sys.spawn('Cohort', 'cohort-3', true)];
+  let coordinator = sys.spawn('Coordinator', 'coordinator', cohorts);
   sys.send(coordinator, 'start_2pc');
 });

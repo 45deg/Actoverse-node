@@ -10,8 +10,8 @@ class Server extends Actor {
   receive(command, arg) {
     if(command == 'start') {
       this.send(this.client, 'set', 1);
-      this.send(this.client, 'get', this.pid);
-      this.send(this.client, 'get', this.pid);
+      this.send(this.client, 'get', this.name);
+      this.send(this.client, 'get', this.name);
     } else if(command == 'response') {
       this.resps.push(arg);
     }

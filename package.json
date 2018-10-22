@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "vorpal": "^1.11.4"
+    "lodash": "^4.17.11",
+    "ws": "^6.1.0"
   }
 }

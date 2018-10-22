@@ -1,5 +1,5 @@
-const actor = require('./lib/index.js');
-const Actor = require('./lib/actor');
+const actor = require('./actorlib/index.js');
+const Actor = require('./actorlib/actor');
 
 class Server extends Actor {
   constructor(client){
@@ -33,7 +33,7 @@ class Client extends Actor {
 }
 
 actor({ Server, Client }).start(function(sys){
-  let client = sys.spawn('Client')
-  let server = sys.spawn('Server', client);
+  let client = sys.spawn('Client', 'a client')
+  let server = sys.spawn('Server', 'a server', client);
   sys.send(server, 'start');
 });

@@ -1,10 +1,3 @@
-/*
- 修正項目
-  ・ACTOR_CREATED と ACTOR_UPDATED のフォーマット統一
-  ・filter -> censorship
-  ・export_filters の廃止
-*/
-
 const _ = require('lodash');
 const System = require('./system');
 // const Server = require('socket.io');
@@ -71,7 +64,8 @@ class Master {
       }
       if(message.event === 'MESSAGE_RECEIVED') {
         let timestamp = message.body.timestamp;
-        this.logicTime.set(name, Math.max(timestamp, this.logicTime.get(name)) + 1);
+        this.logicTime.set(name,
+                           Math.max(timestamp, this.logicTime.get(name)) + 1);
       }
       message.timestamp = this.logicTime.get(name);
       this.log[name].push(_.omit(message, 'type'));
@@ -130,7 +124,9 @@ class Master {
       this.logicTime.set(name, Math.min(time - 1, this.logicTime.get(name)));
 
       if(name !== 'master') {
-        let lastUpdate = _.findLast(this.log[name], e => e.event === 'ACTOR_UPDATED' || e.event === 'ACTOR_CREATED');
+        let lastUpdate = _.findLast(this.log[name],
+            e => e.event === 'ACTOR_UPDATED' ||
+                 e.event === 'ACTOR_CREATED');
         let state = lastUpdate.event === 'ACTOR_CREATED' ?
                       lastUpdate.body.state :
                       lastUpdate.body

@@ -1,5 +1,5 @@
-const actor = require('./lib/index.js');
-const Actor = require('./lib/actor');
+const actor = require('./actorlib');
+const Actor = require('./actorlib/actor');
 
 class Coordinator extends Actor {
   constructor(cohorts) {
@@ -47,19 +47,17 @@ class Cohort extends Actor {
     if (command === 'query') {
       this.send(this.sender, 'agreement', this.decision);
     } else if (command === 'commit') {
-      // commit code here
-      setTimeout(() => {
-        this.send(this.sender, 'commit_ack');
-      }, 1000);
+      this.send(this.sender, 'commit_ack');
     } else if (command === 'rollback') {
-      // rollback code here
       this.send(this.sender, 'rollback_ack');
     }
   }
 }
 
 actor({ Coordinator, Cohort }).start(function(sys){
-  let cohorts = [sys.spawn('Cohort', 'cohort-1', true), sys.spawn('Cohort', 'cohort-2', true), sys.spawn('Cohort', 'cohort-3', true)];
+  let cohorts = [sys.spawn('Cohort', 'cohort-1', true),
+                 sys.spawn('Cohort', 'cohort-2', true),
+                 sys.spawn('Cohort', 'cohort-3', true)];
   let coordinator = sys.spawn('Coordinator', 'coordinator', cohorts);
   sys.send(coordinator, 'start_2pc');
 });

@@ -43,5 +43,5 @@ class MessageFilter {
     return retval;
   }
 }
+
 module.exports = MessageFilter;
-// { type: 'sender', arg: 289, action: 'stop' }
